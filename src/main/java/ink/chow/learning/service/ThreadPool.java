@@ -16,12 +16,13 @@ public class ThreadPool {
 
     public static void main(String[] args) {
         System.out.println(COUNT_BITS);
-        System.out.println(COUNT_MASK);
-        System.out.println(RUNNING);
-        System.out.println(SHUTDOWN);
-        System.out.println(STOP);
-        System.out.println(TIDYING);
-        System.out.println(TERMINATED);
+        System.out.println(Integer.toBinaryString((1 << COUNT_BITS)));
+        System.out.println(Integer.toBinaryString(COUNT_MASK));
+        System.out.println(Integer.toBinaryString(RUNNING));
+        System.out.println(Integer.toBinaryString(SHUTDOWN));
+        System.out.println(Integer.toBinaryString(STOP));
+        System.out.println(Integer.toBinaryString(TIDYING));
+        System.out.println(Integer.toBinaryString(TERMINATED));
 
 
     }
