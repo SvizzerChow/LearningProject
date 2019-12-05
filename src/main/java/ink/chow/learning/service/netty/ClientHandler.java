@@ -1,6 +1,10 @@
 package ink.chow.learning.service.netty;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
@@ -20,35 +24,37 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         final ByteBuf byteBuf = ctx.alloc().buffer(4);
-        byteBuf.writeCharSequence("hello", Charset.defaultCharset());
+        byteBuf.writeCharSequence("hello", StandardCharsets.UTF_8);
         final ChannelFuture f = ctx.writeAndFlush(byteBuf);
-        f.addListener((ChannelFutureListener) future -> {
+        /*f.addListener((ChannelFutureListener) future -> {
             assert f == future;
             ctx.close();
-        });
+        });*/
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf in = (ByteBuf) msg;
         try {
-            StringBuffer stringBuffer = new StringBuffer();
+            byte[] b = new byte[1024];
+            int size = 0;
             while (in.isReadable()){
-                stringBuffer.append((char)in.readByte());
+                if (size == b.length){
+                    b = Arrays.copyOf(b, b.length*2);
+                }
+                b[size++] = in.readByte();
             }
-            String str = stringBuffer.toString();
+            String str = new String(b, 0, size);
             System.out.println(str);
             System.out.flush();
-            if ("你好,干嘛".equals(str)){
-                ctx.write("时间");
+            if ("你好".equals(str)){
+                final ByteBuf byteBuf = ctx.alloc().buffer(4);
+                byteBuf.writeCharSequence("time", StandardCharsets.UTF_8);
+                ctx.writeAndFlush(byteBuf);
             }
         }finally {
             ReferenceCountUtil.release(msg);
         }
-    }
-
-    public void write(String msg){
-
     }
 
 }
