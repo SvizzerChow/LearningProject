@@ -26,26 +26,28 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 /**
  * Description:
  *
- * @author zhoushuai
+ * @author
  * @date 2019/12/6 14:14
  */
 public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        final boolean[] isForm = {false};
         if (msg instanceof HttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
             System.out.println(request.uri());
             System.out.println(request.method());
             System.out.println(request.headers());
             //byte[] content = request.content().array();
+            // 请求体
             String str = request.content().toString(CharsetUtil.UTF_8);
+            // GET请求处理
             if (request.method().equals(HttpMethod.GET)){
                 QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.content().toString(CharsetUtil.UTF_8));
                 Map<String, List<String>> param = queryStringDecoder.parameters();
                 System.out.println("get: " + param);
-            }else if (request.method().equals(HttpMethod.POST)) {
+            }else if (request.method().equals(HttpMethod.POST)) { // post请求处理
+                final boolean[] isForm = {false};
                 HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
                 decoder.offer(request);
                 decoder.getBodyHttpDatas().stream().forEach(s -> {
@@ -66,9 +68,9 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                         System.out.println("长度: "+fileUpload.length());
                     }
                 });
-            }
-            if (!isForm[0]){
-                System.out.println("body: "+str);
+                if (!isForm[0]){
+                    System.out.println("body: "+str);
+                }
             }
         }
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,
